@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speedy Typing Test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container fancy">
+    <img src="Elephant.png" alt="Logo" class="logo">
+    <h1>Speedy Typing Test</h1>
+    <h2 id="player-name" class="player-name"></h2>
+
+    <div id="text-to-type" class="text-box">Click "Start Test" to begin!</div>
+    <textarea id="input-text" placeholder="Start typing here..." disabled></textarea>
+
+    <div class="stats">
+      <p>Time Left: <span id="time-left">2:00</span></p>
+      <p>Speed: <span id="speed">0</span> WPM</p>
+      <p>Accuracy: <span id="accuracy">0</span>%</p>
+      <p>Mistakes: <span id="mistakes">0</span></p>
+    </div>
+
+    <div class="controls">
+      <button id="start-btn" class="btn">Start Test</button>
+      <button id="quit-btn" class="btn alt">Quit Test</button>
+      <a href="index.html" class="btn alt">Change Name</a>
+      <a href="leaderboard.html" class="btn alt">Leaderboard</a>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal">
+      <div class="modal-content">
+        <span id="close-modal" class="close">&times;</span>
+        <h2>Test Results</h2>
+        <p id="modal-message"></p>
+        <div class="modal-buttons">
+          <button id="restart-btn" class="btn">Restart Test</button>
+          <button onclick="window.location.href='index.html'" class="btn alt">Home</button>
+          <button onclick="window.location.href='leaderboard.html'" class="btn alt">Leaderboard</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="attribution">Icon by <a href="https://iconscout.com/icon/elephant-icon_7365171" target="_blank">Iconscout</a></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

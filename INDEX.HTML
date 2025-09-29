@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speedy Typing Test - Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container fancy">
+    <img src="Elephant.png" alt="Logo" class="logo">
+    <h1>Speedy Typing Test</h1>
+    <p class="lead">Register to participate in the typing challenge. Your name will appear on the leaderboard.</p>
+
+    <form id="register-form" class="register-form">
+      <input id="username" type="text" placeholder="Enter your name" required />
+      <div class="form-row">
+        <button type="submit" class="btn">Register & Start</button>
+        <a href="leaderboard.html" class="btn alt">Leaderboard</a>
+      </div>
+    </form>
+    <p class="attribution">Icon by <a href="https://iconscout.com/icon/elephant-icon_7365171" target="_blank">Iconscout</a></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('register-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('username').value.trim();
+      if (!name) return alert('Enter your name!');
+      localStorage.setItem('speedyUser', name);
+      window.location.href = 'test.html';
+    });
+  </script>
+</body>
+</html>

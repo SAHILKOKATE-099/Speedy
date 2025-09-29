@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speedy Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container fancy">
+    <img src="Elephant.png" alt="Logo" class="logo">
+    <h1>🏆 Speedy Leaderboard</h1>
+    <p class="lead">Top 10 participants</p>
+
+    <table id="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>WPM</th>
+          <th>Accuracy</th>
+          <th>Mistakes</th>
+          <th>Time (s)</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="controls">
+      <a href="index.html" class="btn">🏠 Home</a>
+      <a href="test.html" class="btn alt">⌨️ Try Test</a>
+      <button id="clear-btn" class="btn alt">Clear Leaderboard</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const tbody = document.querySelector('#leaderboard-table tbody');
+      const raw = JSON.parse(localStorage.getItem('speedyLeaderboard') || '[]');
+
+      const sorted = raw.sort((a,b)=>b.points-a.points).slice(0,10);
+
+      if(sorted.length===0){
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7">No results yet. Be the first!</td>';
+        tbody.appendChild(row);
+      } else {
+        sorted.forEach((entry, idx)=>{
+          const tr = document.createElement('tr');
+          if(idx===0) tr.classList.add('gold');
+          if(idx===1) tr.classList.add('silver');
+          if(idx===2) tr.classList.add('bronze');
+
+          tr.innerHTML = `
+            <td>${idx+1}</td>
+            <td>${entry.name}</td>
+            <td>${entry.wpm}</td>
+            <td>${entry.accuracy}%</td>
+            <td>${entry.mistakes ?? 0}</td>
+            <td>${entry.time}</td>
+            <td>${entry.points}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('clear-btn').addEventListener('click',()=>{
+        if(confirm("Clear leaderboard?")) {
+          localStorage.removeItem('speedyLeaderboard');
+          location.reload();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
