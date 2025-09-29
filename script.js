@@ -1,181 +1,136 @@
-      document.addEventListener('DOMContentLoaded', () => {
+     document.addEventListener("DOMContentLoaded", () => {
+  const paragraphs = [
+    // Medium paragraphs
+    "Typing is an essential skill in the modern world. Practicing regularly not only increases speed but also improves accuracy. A person who types quickly and correctly can complete tasks faster, communicate more effectively, and reduce mistakes in writing. Consistent practice and concentration are key to mastering typing, and gradually, even complex paragraphs can be typed effortlessly.",
+    "Haathi, the majestic elephant, is renowned for its remarkable intelligence and memory. Elephants are capable of recognizing their companions, recalling water sources over long distances, and even showing empathy towards other creatures. Observing elephants in their natural habitat reveals their complex social structures, strong bonds within family groups, and their ability to solve problems using logic and cooperation.",
+    "In the digital era, learning to type efficiently has become more important than ever. Students, professionals, and content creators depend on typing for writing reports, coding, sending emails, and managing social media. Developing the skill of touch typing, where one types without looking at the keyboard, saves significant time and allows the mind to focus entirely on ideas and composition rather than searching for keys.",
+    "Technology has transformed communication, making it faster and more accessible. From emails to instant messaging, typing forms the backbone of modern interactions. Learning proper typing techniques can prevent repetitive strain injuries, improve ergonomics, and enhance overall productivity. Typing courses and online tools provide structured practice, gradually increasing both speed and accuracy, which are essential for professional growth.",
+    "The journey of mastering typing is similar to learning a musical instrument. Initially, progress may be slow, and mistakes are frequent. However, with patience, practice, and determination, typing can become a seamless extension of thought. Over time, individuals develop muscle memory, allowing them to type complex sentences and lengthy paragraphs with minimal errors, turning typing into a fast, efficient, and enjoyable skill.",
 
-const TEST_DURATION = 120; // 2 minutes
-const textSamples = [
-  // Medium paragraphs
-  "Typing is an essential skill in the modern world Practicing regularly not only increases speed but also improves accuracy A person who types quickly and correctly can complete tasks faster communicate more effectively and reduce mistakes in writing. Consistent practice and concentration are key to mastering typing and gradually even complex paragraphs can be typed effortlessly",
-  "Haathi the majestic elephant is renowned for its remarkable intelligence and memory Elephants are capable of recognizing their companions, recalling water sources over long distances, and even showing empathy towards other creatures Observing elephants in their natural habitat reveals their complex social structures strong bonds within family groups and their ability to solve problems using logic and cooperation",
-  "In the digital era learning to type efficiently has become more important than ever Students professionals and content creators depend on typing for writing reports coding, sending emails and managing social media Developing the skill of touch typing, where one types without looking at the keyboard saves significant time and allows the mind to focus entirely on ideas and composition rather than searching for keys",
-  "Technology has transformed communication, making it faster and more accessible From emails to instant messaging, typing forms the backbone of modern interactions. Learning proper typing techniques can prevent repetitive strain injuries improve ergonomics, and enhance overall productivity Typing courses and online tools provide structured practice gradually increasing both speed and accuracy which are essential for professional growth",
-  "The journey of mastering typing is similar to learning a musical instrument. Initially, progress may be slow and mistakes are frequent However, with patience, practice, and determination, typing can become a seamless extension of thought. Over time individuals develop muscle memory, allowing them to type complex sentences and lengthy paragraphs with minimal errors, turning typing into a fast, efficient and enjoyable skill",
+    // Small paragraphs (2–3 lines)
+    "Typing is like riding a bicycle. At first, it feels awkward, but soon your fingers move without thinking. Practice makes it second nature.",
+    "A fast typist saves time on every task. Speed and accuracy together make you more efficient at school, work, and even gaming.",
+    "Good posture while typing prevents strain. Sit upright, keep wrists straight, and let your fingers glide across the keys with ease.",
+    "Short typing sessions every day are better than one long session once in a while. Consistency builds speed and accuracy over time.",
+    "Typing without looking at the keyboard is called touch typing. It helps you stay focused on ideas instead of searching for letters."
+  ];
 
-  // Small paragraphs
-  "Typing is like riding a bicycle At first it feels awkward, but soon your fingers move without thinking Practice makes it second nature.",
-  "A fast typist saves time on every task Speed and accuracy together make you more efficient at schoolwork, and even gaming",
-  "Good posture while typing prevents strain Sit upright, keep wrists straight and let your fingers glide across the keys with ease",
-  "Short typing sessions every day are better than one long session once in a while Consistency builds speed and accuracy over time",
-  "Typing without looking at the keyboard is called touch typing It helps you stay focused on ideas instead of searching for letters."
-];
+  const textDisplay = document.getElementById("text-display");
+  const textInput = document.getElementById("text-input");
+  const timerEl = document.getElementById("timer");
+  const speedEl = document.getElementById("speed");
+  const accuracyEl = document.getElementById("accuracy");
+  const modal = document.getElementById("result-modal");
+  const modalMessage = document.getElementById("modal-message");
+  const closeModal = document.getElementById("close-modal");
+  const restartBtn = document.getElementById("restart-btn");
 
-const textEl = document.getElementById('text-to-type');
-const inputText = document.getElementById('input-text');
-const speedEl = document.getElementById('speed');
-const accuracyEl = document.getElementById('accuracy');
-const mistakesEl = document.getElementById('mistakes');
-const timeLeftEl = document.getElementById('time-left');
-const startBtn = document.getElementById('start-btn');
-const quitBtn = document.getElementById('quit-btn');
-const playerNameEl = document.getElementById('player-name');
-const modal = document.getElementById('result-modal');
-const modalMessage = document.getElementById('modal-message');
-const closeModal = document.getElementById('close-modal');
-const restartBtn = document.getElementById('restart-btn');
+  let timer;
+  let timeLimit = 120; // 2 minutes
+  let timeLeft;
+  let currentParagraph = "";
+  let startTime;
+  let isTestRunning = false;
 
-let timerRunning = false;
-let timeLeft = TEST_DURATION;
-let interval = null;
-let currentText = "";
-
-// Player Name
-const savedUser = localStorage.getItem('speedyUser');
-if (!savedUser) window.location.href = 'index.html';
-playerNameEl.textContent = `Player: ${savedUser}`;
-
-// Helper Functions
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
-
-function pickRandomText() {
-  return textSamples[Math.floor(Math.random() * textSamples.length)];
-}
-
-function displayText(text) {
-  textEl.innerHTML = '';
-  for (const ch of text) {
-    const span = document.createElement('span');
-    span.textContent = ch;
-    textEl.appendChild(span);
+  function loadParagraph() {
+    currentParagraph = paragraphs[Math.floor(Math.random() * paragraphs.length)];
+    textDisplay.innerHTML = "";
+    currentParagraph.split("").forEach(char => {
+      const span = document.createElement("span");
+      span.innerText = char;
+      textDisplay.appendChild(span);
+    });
+    textInput.value = "";
   }
-}
 
-function startTest() {
-  clearInterval(interval);
-  startBtn.disabled = true;
-  startBtn.textContent = 'Running...';
+  function startTest() {
+    loadParagraph();
+    textInput.disabled = false;
+    textInput.focus();
+    timeLeft = timeLimit;
+    timerEl.innerText = timeLeft;
+    startTime = null;
+    isTestRunning = true;
 
-  currentText = pickRandomText();
-  displayText(currentText);
+    timer = setInterval(() => {
+      timeLeft--;
+      timerEl.innerText = timeLeft;
+      if (timeLeft <= 0) {
+        finishTest();
+      }
+    }, 1000);
+  }
 
-  inputText.value = '';
-  inputText.disabled = false;
-  inputText.focus();
+  function finishTest() {
+    clearInterval(timer);
+    isTestRunning = false;
+    textInput.disabled = true;
 
-  timerRunning = true;
-  timeLeft = TEST_DURATION;
-  timeLeftEl.textContent = formatTime(timeLeft);
-  speedEl.textContent = 0;
-  accuracyEl.textContent = 0;
-  mistakesEl.textContent = 0;
+    const typedText = textInput.value.trim();
+    const correctChars = currentParagraph.split("").filter((ch, i) => typedText[i] === ch).length;
+    const accuracy = Math.round((correctChars / currentParagraph.length) * 100);
 
-  interval = setInterval(tick,1000);
-}
+    const timeTaken = (timeLimit - timeLeft) / 60; // in minutes
+    const wordsTyped = typedText.split(" ").length;
+    const speed = Math.round(wordsTyped / timeTaken) || 0;
 
-function tick() {
-  timeLeft--;
-  if (timeLeft < 0) timeLeft = 0;
-  timeLeftEl.textContent = formatTime(timeLeft);
-  if (timeLeft <= 20) timeLeftEl.style.color = '#ff0';
-  if (timeLeft <= 10) timeLeftEl.style.color = '#f00';
-  if (timeLeft <=0) finalizeTest(false);
-}
+    accuracyEl.innerText = accuracy + "%";
+    speedEl.innerText = speed + " WPM";
 
-function calculateStats() {
-  if(!timerRunning) return;
-  const typed = inputText.value;
-  const spans = textEl.querySelectorAll('span');
-
-  let correctChars = 0;
-  spans.forEach((span,i)=>{
-    const c = typed[i];
-    if(c == null){
-      span.classList.remove('correct','incorrect');
-    } else if(c === span.textContent){
-      span.classList.add('correct');
-      span.classList.remove('incorrect');
-      correctChars++;
+    let performance = "";
+    if (accuracy > 90 && speed > 40) {
+      performance = "Excellent! 🚀";
+    } else if (accuracy > 70 && speed > 25) {
+      performance = "Good Job 👍";
     } else {
-      span.classList.add('incorrect');
-      span.classList.remove('correct');
+      performance = "Keep Practicing 💪";
+    }
+
+    modalMessage.innerText = `Speed: ${speed} WPM\nAccuracy: ${accuracy}%\nPerformance: ${performance}`;
+    modal.style.display = "block";
+  }
+
+  textInput.addEventListener("input", () => {
+    const arrayText = textDisplay.querySelectorAll("span");
+    const arrayValue = textInput.value.split("");
+
+    let correct = true;
+    arrayText.forEach((char, index) => {
+      const typedChar = arrayValue[index];
+      if (typedChar == null) {
+        char.classList.remove("correct", "incorrect");
+        correct = false;
+      } else if (typedChar === char.innerText) {
+        char.classList.add("correct");
+        char.classList.remove("incorrect");
+      } else {
+        char.classList.add("incorrect");
+        char.classList.remove("correct");
+        correct = false;
+      }
+    });
+
+    if (correct && arrayValue.length === currentParagraph.length) {
+      finishTest();
     }
   });
 
-  const typedChars = typed.length;
-  const mistakes = typedChars - correctChars;
-  const elapsedSeconds = Math.max(TEST_DURATION - timeLeft,1);
-  const elapsedMinutes = elapsedSeconds / 60;
-  const wordsTyped = typed.split(/\s+/).filter(w=>w.length>0).length;
-  const wpm = Math.round(wordsTyped / elapsedMinutes);
-  const accuracy = typedChars>0 ? Math.round((correctChars/typedChars)*100) : 0;
+  restartBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+    startTest();
+  });
 
-  speedEl.textContent = wpm;
-  accuracyEl.textContent = accuracy;
-  mistakesEl.textContent = mistakes;
+  closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
 
-  if(typed.length >= currentText.length) finalizeTest(true);
-}
+  // Prevent copy/paste/selection on paragraph
+  textDisplay.addEventListener("contextmenu", (e) => e.preventDefault());
+  textDisplay.addEventListener("copy", (e) => e.preventDefault());
+  textDisplay.addEventListener("cut", (e) => e.preventDefault());
+  textDisplay.style.userSelect = "none";
 
-function finalizeTest(completed){
-  clearInterval(interval);
-  timerRunning = false;
-  inputText.disabled = true;
-  startBtn.disabled = false;
-  startBtn.textContent = 'Start Test';
-
-  const typed = inputText.value;
-  const typedChars = typed.length;
-  let correctChars = 0;
-  for(let i=0;i<typedChars;i++){
-    if(typed[i]===currentText[i]) correctChars++;
-  }
-  const mistakes = typedChars - correctChars;
-  const elapsedSeconds = Math.max(TEST_DURATION - timeLeft,1);
-  const elapsedMinutes = elapsedSeconds/60;
-  const wordsTyped = typed.split(/\s+/).filter(w=>w.length>0).length;
-  const wpm = Math.round(wordsTyped / elapsedMinutes);
-  const accuracy = typedChars>0 ? Math.round((correctChars/typedChars)*100) : 0;
-  const points = Math.max(0, Math.round((wpm*2)+accuracy-elapsedSeconds));
-
-  modalMessage.innerText = `${completed ? 'Test Completed!' : "Time's up!"}\n\nSpeed: ${wpm} WPM\nAccuracy: ${accuracy}%\nMistakes: ${mistakes}\nPoints: ${points}`;
-  modal.style.display = 'block';
-
-  if(completed){
-    const leaderboard = JSON.parse(localStorage.getItem('speedyLeaderboard')||'[]');
-    leaderboard.push({name: savedUser,wpm,accuracy,mistakes,time:elapsedSeconds,points,date:new Date().toISOString()});
-    localStorage.setItem('speedyLeaderboard',JSON.stringify(leaderboard));
-  }
-}
-
-// Event Listeners
-inputText.addEventListener('input',calculateStats);
-startBtn.addEventListener('click',()=>{if(!timerRunning) startTest();});
-quitBtn.addEventListener('click',()=>{
-  if(timerRunning && !confirm("Quit test? Progress won't be saved.")) return;
-  clearInterval(interval);
-  timerRunning = false;
-  inputText.disabled = true;
-  startBtn.disabled = false;
-  startBtn.textContent = 'Start Test';
-  window.location.href='index.html';
+  // Start test when page loads
+  startTest();
 });
-closeModal.addEventListener('click',()=>{modal.style.display='none';});
-restartBtn.addEventListener('click',()=>{modal.style.display='none'; startTest();});
-window.onclick = function(event){if(event.target==modal) modal.style.display='none';};
 
-timeLeftEl.textContent = formatTime(TEST_DURATION);
-speedEl.textContent = 0;
-accuracyEl.textContent = 0;
-mistakesEl.textContent = 0;
-});
